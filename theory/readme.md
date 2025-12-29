@@ -87,7 +87,7 @@ Java SE defines a contract that our implementation of the equals() method must f
 ### Generics
 
 * Type erasure - в рантайме нельзя получить тип List<String>.
-* B,C extends A,  List<A> listA = listB !ERROR иначе можно было бы в listB положить элемент C. ? - wildcard type & bounds нужны для решения этой проблемы:
+* B,C extends A,List<A> listA = listB !ERROR иначе можно было бы в listB положить элемент C. ? - wildcard type & bounds нужны для решения этой проблемы:
   1. Upper bound List<? extends A> - добавлять объекты нельзя, можно итерировать считая все объекты типом A.
   2. Lower bound List<? super A> - можно добавлять родителя класса A, при итерации все объекты считаются типом Object.
   

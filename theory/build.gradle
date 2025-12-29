@@ -23,8 +23,3 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-
-application {
-    // Главный класс приложения
-    mainClass = 'kg.arbocdi.learning.App'
-}
