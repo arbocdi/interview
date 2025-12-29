@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "2181:2181"
+    restart: always
+
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    command: [start-kafka.sh]
+    ports:
+      - "9092:9092"
+    hostname: kafka
+    environment:
+      KAFKA_CREATE_TOPICS: "tips-topic:1:1,customers-topic:1:1,notifications-topic:1:1,timeapp:1:1,qr-topic:1:1,fact-topic:1:1,equeue-topic:1:1,orders-topic:1:1,tmc-topic:1:1,department-topic:1:1,cash-operations-topic:1:1,employees-topic:1:1,schedule-topic:1:1,fbucks-topic:1:1,auth-topic:1:1,billing:1:1" # topic:partition:replicas
+      # KAFKA_ADVERTISED_HOST_NAME: kafka # docker-machine 
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_PORT: 9092
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - "zookeeper"
+    restart: always 
