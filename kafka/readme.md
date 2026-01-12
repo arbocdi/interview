@@ -27,6 +27,14 @@ Consumer group получает сообщения из топика один р
 ![consumer-groups.png](consumer-groups.png)
 ![too much consumers](moreConsumersThenPartitions.png)
 
+Kafka хранит offsets так:
+```
+(group.id, topic, partition) -> offset
+```
+Когда consumer из группы коммитит offset:
+  - он коммитит позицию группы
+  - но только для тех partition, которые сейчас ему назначены
+
 ### Kafka delivery modes
 
 * At most once  — commit до обработки → нет дублей, возможна потеря сообщений.
@@ -58,17 +66,33 @@ Consumer group получает сообщения из топика один р
 * Replicas are copies of partitions.
 * Replicas are maintained for high availability and fault tolerance
 * No two replicas of same partition will ever reside in the same broker
-* <span style="color:blue">Leader</span>
-  * Out of the replicated partitions, exactly one of the replica is elected as a Leader
-  * Kafka clients can only read from and write to leader replica
-  * Other replicas fetch messages from the leader
-* <span style="color:blue">In-Sync Replica ISR</span>
-  * Replicas which have same latest offset as the leader
-  * When leader goes down, one of the ISR is chosen as the leader  
-  * The record is considered “committed” when all isrs for partition wrote to their log. only committed records are readable from consumer. 
-  another partition can be owned by another leader on another kafka broker.
-  
-![replica.png](replica.png)
+* Какие реплики бывают в Kafka:
+  - Leader: 
+    - Ровно одна реплика на партицию
+    - Принимает все записи от продюсеров
+    - Отдаёт данные консьюмерам
+  - Follower
+    - Остальные реплики партиции
+    - Читают лог у лидера
+    - Сами продюсеров и консьюмеров не обслуживают
+* ISR (In-Sync Replicas) — это подмножество реплик (leader + followers), которые:
+  - не отстали от лидера больше чем на replica.lag.time.max.ms
+  - не имеют слишком большого лагa по offset’ам
+  - считаются консистентными
+  - Leader всегда входит в ISR
+  - Могут стать лидером при фейловере
+* Out-of-Sync Replicas. Это реплики, которые:
+  - входят в replicas
+  - не входят в ISR
+* П: Всего 3 реплики и с такими настройками лидер и 1 follower должны подтвердить сохранение сообщения: 
+```
+acks=all
+
+replication.factor = 3
+min.insync.replicas = 2
+```
+* 
+* ![replica.png](replica.png)
 
 ### Kafka inside docker
 
