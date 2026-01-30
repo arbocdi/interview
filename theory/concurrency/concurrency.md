@@ -89,6 +89,11 @@ Only one thread can perform actions inside synchronized block.
 ```
 volatile write  HB→  volatile read (если читатель видит значение)
 ```
+### 2.3 ReentrantLock
+- Unlock HB Lock
+### 2.4 Atomic*
+- CAS HB CAS|read
+
 
 ---
 
@@ -97,33 +102,39 @@ volatile write  HB→  volatile read (если читатель видит зн�
 ### 3.1 CAS (Compare-And-Swap)
 Атомарная CPU-инструкция:
 
-```
-if (*address == expected)
-    *address = newValue
-```
-
-### 3.2 AtomicInteger/AtomicLong — CAS loop
-
-```
-for (;;) {
-    old = get()
-    new = old + 1
-    if (CAS(old → new)) break
+```javascript
+boolean CAS(addr, expected, update){
+//Atomically:
+if (*addr == expected) {
+    *addr = update
+    return true
+}
+return false
 }
 ```
+### 3.2 AtomicInteger/AtomicLong — CAS loop
 
-CAS быстрый, но при конкуренции возможны многочисленные retry.
-
+```javascript
+for (;;) {
+    old = get(*addr)
+    new = old + 1
+    if (CAS(*addr,old,new)) break
+}
+```
+CAS быстрый, но при конкуренции возможны многочисленные retry и busy loop (Atomic* будет жрать цпу).
+* **LongAdder** тоже работает на CAS, но оптимизирован и не жрет цпу. Именно его используют как счетчик.
+В отличие от Atomic* не создает отношений HB.
 ---
 
 ## 4. ReentrantLock, очереди и CAS
 
-ReentrantLock построен на AQS:
+ReentrantLock построен на AbstractQueuedSynchronizer (AQS):
 
 - `state` — счётчик (reentrant), увеличивается при lock() и уменьшается при unlock(), state==0 - лок свободен
 - `exclusiveOwnerThread` — владелец
-- очередь ожидания
+- очередь ожидания (AQS)
 - CAS(state, 0→1) — попытка захвата
+- если CAS не прошел, то поток помещается в AQS и засыпает (не жрет цпу)
 
 ### Unfair lock:
 ```
@@ -273,7 +284,14 @@ synchronized{
 //rewrite to:
 synchronized{
     if(condition) //some actions
+```
+### Реализация через busy loop (жрет цпу)
+```java
+volatile boolean condition;
+while (!condition) {
+    // ничего не делаем
 }
 ```
+ё
 ---
 

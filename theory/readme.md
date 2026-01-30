@@ -1,4 +1,4 @@
-### Object Creation
+## Object Creation
 1. Class loading
     - If the class is not loaded yet, the JVM loads it and prepares its static data.
 2. Memory allocation
@@ -16,7 +16,7 @@
 6. Return reference
     - JVM returns a reference to the newly created object.
 
-### Equals & HashCode
+## Equals & HashCode
 
 * equals() Contract
 Java SE defines a contract that our implementation of the equals() method must fulfill. Most of the criteria are common sense. The equals() method must be:
@@ -32,7 +32,7 @@ Java SE defines a contract that our implementation of the equals() method must f
  
 * Memory Leak: when there are objects present in the heap that are no longer used, but the garbage collector is unable to remove them from memory (huge static fields, thread locals etc)
 
-### GC 
+# GC 
 ![gen](generations.png)
 
 ## GC этапы
@@ -77,30 +77,35 @@ Java SE defines a contract that our implementation of the equals() method must f
 
 
   
-### Java Memory Regions
+# Java Memory Regions
 1. Heap space - objects stored here.
 2. Meta space - compiled objects of methods and classes are stored here.
 3. Stack space - local variables and references stored here for each thread in Stack structure.
 
 ![memory.png](memory.png)
 
-### Generics
+# Generics
 
 * Type erasure - в рантайме нельзя получить тип List<String>.
 * B,C extends A,List<A> listA = listB !ERROR иначе можно было бы в listB положить элемент C. ? - wildcard type & bounds нужны для решения этой проблемы:
   1. Upper bound List<? extends A> - добавлять объекты нельзя, можно итерировать считая все объекты типом A.
   2. Lower bound List<? super A> - можно добавлять родителя класса A, при итерации все объекты считаются типом Object.
   
-### Reference types
-
-1. Hard-references — стандартные ссылки на объекты, которые становится eligible for collection после недостижимости из root set
+# Reference types
+O:GC ROOTS - это набор объектов, которые считаются точками входа в граф объектов. 
+Например объекты, ссылки на которые есть в живых потоках. 
+1. Hard-references — стандартные ссылки на объекты, которые становится eligible for collection после недостижимости из GC ROOTS
 2. Soft-references — объекты могут удалятся GC при недостатке памяти
+3. WeakReference — слабые, GC чистит при любом удобном случае. WeakHashMap<K, V> — это Map, у которой 
+ключи хранятся через WeakReference. Если на ключ больше нет сильных ссылок вне карты, GC имеет право
+удалить ключ и значение.
 
-### Classloaders
+
+# Classloaders
 
 * Loading order:
-  1. if the Classloader has already loaded the class and returns the class from its cache,
-  2. if not it asks their Parent ClassLoader
+  1. if the Classloader has already loaded the class, it returns the class from its cache
+  2. if not, it asks their Parent ClassLoader
   3. if the Parent ClassLoader doesn’t have the class, the ClassLoader loads it from the associated location
 
 ![clHierarchy.jpg](clHierarchy.jpg)
@@ -108,7 +113,7 @@ Java SE defines a contract that our implementation of the equals() method must f
 * classId=classloader+FQDN
 
 
-### Concurrency:
+# Concurrency:
 
 * Singleton wih double checked locking (valitale нужне для того, чтобы объект полностью инициализировался):
 ```java
@@ -126,7 +131,7 @@ class Foo {
 }
 ```
 
-### LRU cache
+# LRU cache
 * Для реализации LRU удобно использовать LinkedHashMap (нач размер, 0.75f, при get перемещать элемент в конец списка tue|false)
 * Эта мапа хранит порядок элементов в двусвязном списке и может перемещать элемент в конец при доступе к нему, либо просто добавлять в конец списка новые элементы.
 * Содержит метод boolean removeEldestEntry(Map.Entry<K,V> eldest), если он возвращает true, то eldest-элемент удаляется.
@@ -135,7 +140,7 @@ class Foo {
 
 [LRU cache](src/main/java/kg/arbocdi/theory/LRUCache.java)
 
-### Object identity
+# Object identity
 * Every object in Java has its identity, which differs it from any other objects. 
 * Identity hash code: if not overridden then hashCode==identityHashCode. 
 ```java

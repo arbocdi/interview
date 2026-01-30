@@ -65,7 +65,7 @@ So concurrent execution doesn't match any sequential one.
 * Syntax:
 ```sql
 CREATE INDEX idx_name 
-ON table(column1[,column2]) [USING idx_type]
+ON table_name(column1[,column2]) [USING idx_type]
 ```
 * Index types: 
   - Hash: fast, only equality is supported.
@@ -89,6 +89,24 @@ intersect A and B
 algorithm for COMPOSITE indxe:
 just read rows using single index
 ```
+* Что такое индекс на 2 колонки в Postgres
+
+```sql
+CREATE INDEX idx ON t (a, b);
+```
+Это ОДИН B-tree, где ключ = (a, b).
+```txt
+Упорядочивание:
+(a1, b1)
+(a1, b2)
+(a1, b3)
+(a2, b1)
+(a2, b2)
+(a3, b7)
+```
+👉 Сначала сортировка по a, внутри одинаковых a — по b.
+* Такой индекс плохо работает по 2м диапазонам a и b, лучше два разных индекса+перресечение.
+
 # Window Functions
 
 Window functions allow you to compute values over a "window" of rows
