@@ -81,6 +81,13 @@ ProducerFencedException
 * Zombie producers would result in duplicate messages as they would be publishing the same events that any new replacement producer would be creating
 * A way to avoid these potential duplicates is to use a transactional producer for the creation of all events. If a replacement producer is created, it should then use the same transactional.id as the original.
 Original one will be fenced out (огорожен).
+* В спринг же есть DefaultTransactionIdSuffixStrategy, которая добавляет суффиксы к транзакциям продюсеров:
+```
+when maxCache greater than zero → reuse suffixes
+otherwise → generate suffixes on the fly by incrementing a counter
+defaukt:maxCache = 0
+```
+если суффиксов на одновременные транзакции не хватает, будет выброшено NoProducerAvailableException.
 ## 5. Жизненный цикл транзакции
 
 ```text
@@ -111,7 +118,8 @@ spring.kafka.producer.transaction-id-prefix=tx-
 то ProducerFactory станет транзакционным и будет добавлен бин **KafkaTrtansactionManager**.
 * Если при этом есть **TransactionManager для БД**, то при использовании **@Transactional** возникнет конфликт 
 тк 2 бина реализуют один и тот же **@PlatformTransactionManager**. И придется различать бины по имени.
-
+* Если метод аннотирован **@Transactional**, и использован например JpaTransactionManager, то KafkaTemplate присоединиться
+к транзакции и запустится кафка транзакция, которая завершится после коммита бд-транзакции. 
 ---
 ## 6. Порядок сообщений
 

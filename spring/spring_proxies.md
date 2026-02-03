@@ -150,7 +150,7 @@ class RequestBean {}
 
 ---
 
-## 3. ScopedProxyMode — что это и зачем
+## 2.1 ScopedProxyMode — что это и зачем
 
 `ScopedProxyMode` управляет **как именно Spring создаёт scope‑прокси**.
 
@@ -220,7 +220,21 @@ Real Bean
 ⚠️ Ограничения:
 - `final` классы и методы не проксируются
 
+### Решение 2 - ObjectProvider<MyBean>
+- ObjectProvider<MyBean> при вызове get() поищет бин в нужном скоупе.
+
 ---
+## 3. Lazy Proxy
+- Создается, если синглтон аннторирован @Lazy.
+- Сам бин инициализируется при первом вызове его метода.
+- Это lazy-init proxy, создаваемая ContextAnnotationAutowireCandidateResolver
+
+Технически:
+```
+если есть интерфейс → JDK dynamic proxy
+
+если интерфейса нет → CGLIB proxy
+```
 
 ## 4. Главное различие AOP‑прокси и scope‑прокси
 
