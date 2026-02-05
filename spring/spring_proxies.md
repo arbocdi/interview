@@ -106,6 +106,8 @@ class Service {
 ---
 
 ### Решение — scope‑proxy
+Если scoped-бин внедряется в бин с более широким scope (например request → singleton), Spring автоматически создаёт 
+scoped-proxy, даже если proxyMode явно не указан.
 
 ```java
 @Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)

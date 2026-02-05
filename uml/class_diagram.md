@@ -164,7 +164,7 @@ class EmailSender
 class PaymentService
 
 class Dog{
-+List lags
++List legs
 }
 class Library{
 -List books
@@ -176,7 +176,7 @@ class Library{
 Customer "1" --> "0..*" Order :  association
 
 %% 3) Composition (Order owns OrderLine lifecycle)
-Dog "1" *-- "1..*" Lag :  composition
+Dog "1" *-- "1..*" Leg :  composition
 
 %% 2) Aggregation (Order references Product; product lives independently)
 Library "0..*" o-- "1" Book :  aggregation
